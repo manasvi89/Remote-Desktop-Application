@@ -10,6 +10,7 @@
  */
 import java.awt.AWTException;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
@@ -17,10 +18,16 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import static java.lang.Thread.sleep;
 import java.net.Socket;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 public class Client implements Runnable {
 
@@ -28,6 +35,7 @@ public class Client implements Runnable {
     private static Client clientApp = null;
     private String serverName = "127.0.0.1"; //loop back ip
     private int portNo = 8080;
+    private Date date = null;
     //private Socket serverSocket = null;
    
     
@@ -48,40 +56,44 @@ public class Client implements Runnable {
 
     @Override
     public void run() {
+         JFrame frame = new JFrame();
+    
+        frame.setSize(1920, 1050);
+        frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+        
+        frame.pack();
+        frame.setVisible(true);
         while(true){
-            if(nextTime < System.currentTimeMillis()){
-                System.out.println(" get screen shot ");
-                try {
-                    clientApp.sendScreen();
-                    clientApp.getNextFreq();
-                } catch (AWTException e) {
-                    // TO DO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    // TO DO Auto-generated catch block
-                    e.printStackTrace();
-                } catch(Exception e){
-                    e.printStackTrace();
-                }
-               
-            }
             try {
+
+                date = new Date();
+                Socket serverSocket = new Socket(serverName, portNo);
+                DateFormat dateFormat = new SimpleDateFormat("_yyMMdd_HHmmss");
+                String fileName = serverSocket.getInetAddress().getHostName().replace(".", "-");
+                System.out.println(fileName);
+                BufferedImage img=ImageIO.read(ImageIO.createImageInputStream(serverSocket.getInputStream()));
+                
+                
+                JLabel lab = new JLabel(new ImageIcon(img));
+                lab.setSize(500, 500);
+                frame.add(lab);
+                frame.repaint();
+                frame.pack();
+                
+                
                 sleep(1000);
-                //System.out.println(" statrted ....");
-            } catch (InterruptedException ex) {
+                frame.remove(lab);
+                
+                System.out.println("Image here");
+             
+            } catch (IOException ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            } catch (InterruptedException ex) {
+                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+             }
         }
        
     }
 
-    private void sendScreen()throws AWTException, IOException {
-           Socket serverSocket = new Socket(serverName, portNo);
-             Toolkit toolkit = Toolkit.getDefaultToolkit();
-             Dimension dimensions = toolkit.getScreenSize();
-                 Robot robot = new Robot();  // Robot class
-                 BufferedImage screenshot = robot.createScreenCapture(new Rectangle(dimensions));
-                 ImageIO.write(screenshot,"png",serverSocket.getOutputStream());
-                 serverSocket.close();
-    }
+    
 }
