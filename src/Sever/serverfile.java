@@ -8,69 +8,77 @@
  *
  * @author Shivani Kadam
  */
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.Scanner;
+import java.net.*;
+import java.io.*;
 
 public class serverfile {
 
-    public final static int SOCKET_PORT = 1234;  // you may change this
-    public static String FILE_TO_SEND;  // you may change this
+    private Socket socket = null;
+    private static ObjectOutputStream outputStream = null;
+    private FileEvent fileEvent = null;
+    private static String fname;
+    private String destinationPath = "F:/study/sem5/";
 
-    public static void main(String[] args) throws IOException {
-        FileInputStream fis = null;
-        BufferedInputStream bis = null;
-        OutputStream os = null;
-        ServerSocket servsock = null;
-        Socket sock = null;
-        Scanner input = new Scanner(System.in);
-        try {
-            servsock = new ServerSocket(SOCKET_PORT);
-            while (true) {
-                System.out.println("Waiting...");
+    public static void main(String args[]) throws Exception {                           // establishing the connection with the server
+        ServerSocket sersock = new ServerSocket(1234);
+        System.out.println("Server ready ");
+        Socket sock = sersock.accept();
+        System.out.println("Connection is successful ");
 
-                sock = servsock.accept();
-                System.out.println("Accepted connection : " + sock);
-                // send file
+        // reading the file name from client
+        
+        InputStream istream = sock.getInputStream();
+        BufferedReader fileRead = new BufferedReader(new InputStreamReader(istream));
+        fname = fileRead.readLine();
+        outputStream = new ObjectOutputStream(sock.getOutputStream());
+        serverfile o1 = new serverfile();
+        o1.sendFile();
+        sock.close();
+        istream.close();
+        fileRead.close();;
+        sersock.close();
+    }
 
-                for (int i = 0; i < 3; i++) {
-                    System.out.println("Enter path: ");
-                    FILE_TO_SEND = input.next();
-                    File myFile = new File(FILE_TO_SEND);
-//                    if (!myFile.exists()){
-//                        System.out.println("Not there.");
-//                        continue;
-//                    }
-                    byte[] mybytearray = new byte[(int) myFile.length()];
-                    fis = new FileInputStream(myFile);
-                    bis = new BufferedInputStream(fis);
-                    bis.read(mybytearray, 0, mybytearray.length);
-                    os = sock.getOutputStream();
-                    System.out.println("Sending " + FILE_TO_SEND + " " + mybytearray.length + " bytes");
-                    os.write(mybytearray, 0, mybytearray.length);
-                    os.flush();
-                    System.out.println("Done.");
-
-                    if (bis != null) {
-                        bis.close();
-                    }
-                    if (os != null) {
-                        os.close();
-                    }
-                    if (sock != null) {
-                        sock.close();
-                    }
+    public void sendFile() {
+        fileEvent = new FileEvent();
+        String fileName = fname.substring(fname.lastIndexOf("/") + 1, fname.length());
+        String path = fname.substring(0, fname.lastIndexOf("/") + 1);
+        fileEvent.setDestinationDirectory(destinationPath);
+        fileEvent.setFilename(fileName);
+        fileEvent.setSourceDirectory(fname);
+        File file = new File(fname);
+        if (file.isFile()) {
+            try {
+                DataInputStream diStream = new DataInputStream(new FileInputStream(file));
+                long len = (int) file.length();
+                byte[] fileBytes = new byte[(int) len];
+                int read = 0;
+                int numRead = 0;
+                while (read < fileBytes.length && (numRead = diStream.read(fileBytes, read, fileBytes.length - read)) >= 0) {
+                    read = read + numRead;
                 }
+                fileEvent.setFileSize(len);
+                fileEvent.setFileData(fileBytes);
+                fileEvent.setStatus("Success");
+            } catch (Exception e) {
+                e.printStackTrace();
+                fileEvent.setStatus("Error");
             }
-        } finally {
-            if (servsock != null) {
-                servsock.close();
-            }
+        } else {
+            System.out.println("path specified is not pointing to a file");
+            fileEvent.setStatus("Error");
         }
+//Now writing the FileEvent object to socket
+        try {
+            outputStream.writeObject(fileEvent);
+            System.out.println("Done...Going to exit");
+            Thread.sleep(3000);
+            System.exit(0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 }
