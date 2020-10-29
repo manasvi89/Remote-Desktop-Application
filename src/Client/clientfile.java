@@ -8,62 +8,64 @@
  *
  * @author Shivani Kadam
  */
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.Socket;
+import java.net.*;
+import java.io.*;
 
 public class clientfile {
 
-    public final static int SOCKET_PORT = 1234;
-    public final static String SERVER = "127.0.0.1";
-    // public final static String FILE_TO_RECEIVED = "test.txt";  
+    private static String sourceFilePath;
+    private static ObjectInputStream inputStream =null;
+    private FileEvent fileEvent = null;
+    private File dstFile = null;
+    private FileOutputStream fileOutputStream = null;
 
-    public final static int FILE_SIZE = 10000;
+    public static void main(String args[]) throws Exception {
+        Socket sock = new Socket("127.0.0.1", 1234);
 
-    public static void main(String[] args) throws IOException {
-        int bytesRead;
-        int current = 0;
-        FileOutputStream fos = null;
-        BufferedOutputStream bos = null;
-        Socket sock = null;
+        // reading the file name 
+        System.out.print("Enter the file name : ");
+        BufferedReader keyRead = new BufferedReader(new InputStreamReader(System.in));
+        sourceFilePath = keyRead.readLine();
+
+        // sending the file name to server
+        OutputStream ostream = sock.getOutputStream();
+        PrintWriter pwrite = new PrintWriter(ostream, true);
+        pwrite.println(sourceFilePath);
+        inputStream = new ObjectInputStream(sock.getInputStream());
+        clientfile o1 = new clientfile();
+        o1.downloadFile();
+        
+        sock.close();
+        ostream.close();;
+        pwrite.close();
+    }
+
+    public void downloadFile() {
         try {
-            sock = new Socket(SERVER, SOCKET_PORT);
-
-            while (true) {
-
-                System.out.println("Connecting...");
-
-                // receive file
-                for (int i = 0; i < 3; i++) {
-
-                    File file = new File("file" + i);
-                    file.createNewFile();
-                    byte[] mybytearray = new byte[FILE_SIZE];
-                    InputStream ip = sock.getInputStream();
-                    fos = new FileOutputStream(file);
-                    bos = new BufferedOutputStream(fos);
-                    bytesRead = ip.read(mybytearray, 0, mybytearray.length);
-                    current = bytesRead;
-
-                    bos.write(mybytearray, 0, current);
-                    bos.flush();
-                    System.out.println("File " + file + " downloaded " + current + " bytes read");
-                    if (fos != null) {
-                        fos.close();
-                    }
-                    if (bos != null) {
-                        bos.close();
-                    }
-                    
-                }
+            fileEvent = (FileEvent) inputStream.readObject();
+            if (fileEvent.getStatus().equalsIgnoreCase("Error")) {
+                System.out.println("Error occurred ..So exiting");
+                System.exit(0);
             }
-        } finally {
-            if (sock != null) {
-                sock.close();
+            String outputFile = fileEvent.getDestinationDirectory() + fileEvent.getFilename();
+            if (!new File(fileEvent.getDestinationDirectory()).exists()) {
+                new File(fileEvent.getDestinationDirectory()).mkdirs();
             }
+            dstFile = new File(outputFile);
+            fileOutputStream = new FileOutputStream(dstFile);
+            fileOutputStream.write(fileEvent.getFileData());
+            fileOutputStream.flush();
+            fileOutputStream.close();
+            System.out.println("Output file : " + outputFile + " is successfully saved ");
+            Thread.sleep(3000);
+            System.exit(0);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }
