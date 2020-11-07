@@ -1,3 +1,5 @@
+package Server;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -17,7 +19,7 @@ public class serverfile {
     private static ObjectOutputStream outputStream = null;
     private FileEvent fileEvent = null;
     private static String fname;
-    private String destinationPath = "F:/study/sem5/";
+    private String destinationPath = "./Downloads/";
 
     public static void main(String args[]) throws Exception {                           // establishing the connection with the server
         ServerSocket sersock = new ServerSocket(1234);
