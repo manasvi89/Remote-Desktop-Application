@@ -13,7 +13,7 @@
 * Written in JAVA
 
 # Installation:
-git clone https://github.com/manasvi89/Remote-Desktop-Application
+git clone https://github.com/manasvi89/Remote-Desktop-Application \
 $ cd ../path/to/the/file
 
 # How to use:
