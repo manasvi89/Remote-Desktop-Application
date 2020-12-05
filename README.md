@@ -29,7 +29,7 @@ $ cd ../path/to/the/file
 * Chat or messaging
 
 # image
-![RDP](./blob/src/cn_lab_project_rdp/RDP.jpeg)
+![RDP](./src/cn_lab_project_rdp/RDP.jpeg)
 
 
   
