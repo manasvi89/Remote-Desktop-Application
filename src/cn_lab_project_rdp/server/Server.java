@@ -100,7 +100,7 @@ public class Server extends Thread {
         });
 
         //Thread to Receive events from clients
-        Thread ServerThread2 = new Thread(new Runnable() {
+        Thread Server_Thread_2 = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -132,7 +132,7 @@ public class Server extends Thread {
         });
 
         //Thread for chat with Clients
-        Thread ServerThread3 = new Thread(new Runnable() {
+        Thread Server_Thread_3 = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (true) {
