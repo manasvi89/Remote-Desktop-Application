@@ -3,7 +3,7 @@
     <type>org.netbeans.modules.java.j2seproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/j2se-project/3">
-            <name>Remote-Desktop</name>
+            <name>CN_Lab_Project_RDP</name>
             <source-roots>
                 <root id="src.dir"/>
             </source-roots>
