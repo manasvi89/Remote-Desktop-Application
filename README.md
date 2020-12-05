@@ -1,8 +1,8 @@
 # Remote Desktop Application
  
 # Project Description
-Remote Desktop Application is a software that allows a user to connect to a computer in another location, interacting as if they were locally connected. 
-It is able to control the server-side screen as well. Allowing the client to use various features of the software will be in the hands of the server.
+* Remote Desktop Application is a software that allows a user to connect to a computer in another location, interacting as if they were locally connected. 
+* It is able to control the server-side screen as well. Allowing the client to use various features of the software will be in the hands of the server.
 
 # Requirements for implementation:
 JDK 1.5 (JRE 1.5) or above
@@ -29,7 +29,7 @@ File transfer
 Chat or messaging
 
 # image
-![alt text](https://github.com/manasvi89/Remote-Desktop-Application/blob/main/src/cn_lab_project_rdp/RDP.jpeg=true)
+![RDP](https://github.com/shivanikadam910/Remote-Desktop-Application/blob/src/cn_lab_project_rdp/RDP.jpeg?raw=true)
 
 
   
