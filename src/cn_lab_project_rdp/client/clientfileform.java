@@ -91,6 +91,7 @@ static String ip="";
 	/* call downloadfileform on button action */
         this.setVisible(false);
         downloadfileform d = new downloadfileform(ip);
+	d.setBounds(550, 150, 700, 300);
         d.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
