@@ -82,6 +82,7 @@ static String ip="";
 
 	/* Call uploadfileform on button action */
         uploadfileform u = new uploadfileform(ip);
+	u.setBounds(550, 150, 700, 300);
         u.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
