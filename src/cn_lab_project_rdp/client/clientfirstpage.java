@@ -18,9 +18,7 @@ import javax.swing.JOptionPane;
 
 public class clientfirstpage extends javax.swing.JFrame {
 
-    /**
-     * Creates new form clientfirstpage
-     */
+    //Initializing JFrame
     public clientfirstpage() {
         initComponents();
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -102,10 +100,13 @@ public class clientfirstpage extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-
+        
+        //Checking Null values of IP
         if (ipAddress.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please enter the IP address to get connected");
         } else {
+            
+            //Chat and Share Screen Window Initialization
             Client c = new Client(ipAddress.getText());
             clientmsg c1 = new clientmsg(ipAddress.getText());
             c1.setBounds(0, 0, 800, 700);
@@ -118,9 +119,12 @@ public class clientfirstpage extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         
+        //Checking Null values of IP
         if (ipAddress.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please enter the IP address to get connected");
         } else {
+            
+            //File Transfer Initialization
             clientfileform c = new clientfileform(ipAddress.getText());
             c.setBounds(550, 150, 800, 700);
             c.setResizable(false);
@@ -128,15 +132,16 @@ public class clientfirstpage extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String args[]) throws UnknownHostException {
 
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
+                    
+                    //Setting Host IP address in the frame
                     new clientfirstpage().setVisible(true);
+                    
+                    //Getting IP address of the host
                     InetAddress IP = InetAddress.getLocalHost();
                     System.out.println("My IP Address is:");
                     System.out.println(IP.getHostAddress());

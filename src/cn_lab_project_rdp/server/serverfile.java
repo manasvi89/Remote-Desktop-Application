@@ -1,20 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package cn_lab_project_rdp.server;
 
-/**
- *
- * @author Dishita Madani
- */
 import cn_lab_project_rdp.server.FileEvent;
 import java.net.*;
 import java.io.*;
 
 public class serverfile {
 
+	/* Define socket and parameters */
     private Socket socket = null;
     private File dstFile = null;
     private static ObjectOutputStream outputStream = null;
@@ -31,28 +24,31 @@ public class serverfile {
         System.out.println("Connection is successful ");
 
         serverfile o1 = new serverfile();
-
+	
+	/* Define input stream and read line from client */
         InputStream istream = sock.getInputStream();
         BufferedReader fileRead = new BufferedReader(new InputStreamReader(istream));
         fname = fileRead.readLine();
 
-        //   System.out.println("inputstream : " + istream);
-        //  System.out.println("fileread : " + fileRead);
-        //   System.out.println("fname : " + fname);
+	/* fname is filename given by client */
         if (fname.contains("download")) {
 
             System.out.println(removeWord(fname, "download"));
+
+		/* remove word " download " from string */
             fname = removeWord(fname, "download");
             outputStream = new ObjectOutputStream(sock.getOutputStream());
-            System.out.println("send nai");
+            
+		/* call function send file */
             o1.sendFile();
             istream.close();
             fileRead.close();
         } else {
-            System.out.println("\n hello");
+            
+		/* not download then its upload file option */
             inputStream = new ObjectInputStream(sock.getInputStream());
-            System.out.println("\n heee " + inputStream);
-            System.out.println("download thvi joie");
+            
+            /* client upload file so download in server*/
             o1.downloadFile();
         }
 
@@ -65,6 +61,7 @@ public class serverfile {
 
     }
 
+	/* Function for remove word from string */
     public static String removeWord(String string, String word) {
         if (string.contains(word)) {
             String tempWord = word + " ";
@@ -76,6 +73,8 @@ public class serverfile {
     }
 
     public void sendFile() throws IOException {
+
+		/* file event - management */
         fileEvent = new FileEvent();
         String fileName = fname.substring(fname.lastIndexOf("/") + 1, fname.length());
         String path = fname.substring(0, fname.lastIndexOf("/") + 1);
@@ -85,6 +84,7 @@ public class serverfile {
         File file = new File(fname);
         if (file.isFile()) {
             try {
+			/* Read input name and data of file from client */
                 DataInputStream diStream = new DataInputStream(new FileInputStream(file));
                 long len = (int) file.length();
                 byte[] fileBytes = new byte[(int) len];
@@ -93,6 +93,8 @@ public class serverfile {
                 while (read < fileBytes.length && (numRead = diStream.read(fileBytes, read, fileBytes.length - read)) >= 0) {
                     read = read + numRead;
                 }
+
+		/* send file with all its attributes */
                 fileEvent.setFileSize(len);
                 fileEvent.setFileData(fileBytes);
                 fileEvent.setStatus("Success");
@@ -101,10 +103,12 @@ public class serverfile {
                 fileEvent.setStatus("Error");
             }
         } else {
+
+		/* not proper path error  */
             System.out.println("path specified is not pointing to a file");
             fileEvent.setStatus("Error");
         }
-//Now writing the FileEvent object to socket
+
         try {
             outputStream.writeObject(fileEvent);
             System.out.println("Done...Going to exit");
@@ -116,17 +120,24 @@ public class serverfile {
 
     }
 
+	/* download file function */
     public void downloadFile() {
         try {
+
+		/* error if path is not found or file event is not handled */
             fileEvent = (FileEvent) inputStream.readObject();
             if (fileEvent.getStatus().equalsIgnoreCase("Error")) {
                 System.out.println("Error occurred ..So exiting");
                 System.exit(0);
             }
+
+		/* successfully downloaded */
             String outputFile = fileEvent.getDestinationDirectory() + fileEvent.getFilename();
             if (!new File(fileEvent.getDestinationDirectory()).exists()) {
                 new File(fileEvent.getDestinationDirectory()).mkdirs();
             }
+
+		/* Destination of output file */
             dstFile = new File(outputFile);
             fileOutputStream = new FileOutputStream(dstFile);
             fileOutputStream.write(fileEvent.getFileData());
@@ -136,6 +147,7 @@ public class serverfile {
             Thread.sleep(3000);
             System.exit(0);
 
+		/* catch error */
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {

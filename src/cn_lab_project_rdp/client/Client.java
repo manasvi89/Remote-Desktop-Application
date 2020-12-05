@@ -26,24 +26,23 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 class Client extends Thread {
-
+//Height and Width sync class
     class Control {
-
-        public AtomicInteger height = new AtomicInteger(0);
+        public AtomicInteger height = new AtomicInteger(0);               
         public AtomicInteger width = new AtomicInteger(0);
         public volatile JFrame frame;
         public volatile JPanel panel;
     }
 
     final Control c = new Control();
-    clientfirstpage c1 = new clientfirstpage();
+    clientfirstpage c1 = new clientfirstpage();               
     private static long nextTime = 0;
     private static Client clientApp = null;
     private String serverName = c1.ipAddress.getText(); //loop back ip
     private static int portNo = 8087;
     static String ip ="";
     
-    
+    //Receive Screen Thread 
     class T1 implements Runnable {
 
         @Override
@@ -51,27 +50,45 @@ class Client extends Thread {
 
             while (true) {
                 try {
-Toolkit toolkit = Toolkit.getDefaultToolkit();
-        Dimension dimensions = toolkit.getScreenSize();
-                    Socket serverSocket = new Socket(serverName, portNo);
-                    DateFormat dateFormat = new SimpleDateFormat("_yyMMdd_HHmmss");
-                    String fileName = serverSocket.getInetAddress().getHostName().replace(".", "-");
-                    System.out.println(fileName);
-                    BufferedImage img = ImageIO.read(ImageIO.createImageInputStream(serverSocket.getInputStream()));
-                    c.height.set(img.getHeight());
-                    c.width.set(img.getWidth());
-     
-                    c.panel.setSize(dimensions.width,dimensions.height);
-     
+                    
+                    //Getting screen size for frame
+                    
+                    Toolkit toolkit = Toolkit.getDefaultToolkit();
+                    Dimension dimensions = toolkit.getScreenSize();               
+                    
+                    //New Socket for receiving screen  
+                    Socket serverSocket = new Socket(serverName, portNo);         
                   
+                     //Host IP address
+                    String fileName = serverSocket.getInetAddress().getHostName().replace(".", "-"); 
+                    System.out.println(fileName);
+                    
+                    //Get image from Socket
+                    BufferedImage img = ImageIO.read(ImageIO.createImageInputStream(serverSocket.getInputStream()));  
+                   
+                    //Height and width of image
+                    c.height.set(img.getHeight());                                   
+                    c.width.set(img.getWidth()); 
+ 
+                    //Panel dimensions
+                    c.panel.setSize(dimensions.width,dimensions.height);  
+                     
                     JLabel lab;
+                    
+                    //Setting image into label
                     lab = new JLabel(new ImageIcon((new ImageIcon(img).getImage().getScaledInstance(c.panel.getWidth(), c.panel.getHeight(), java.awt.Image.SCALE_SMOOTH))));
-                    c.panel.add(lab);
-                    c.frame.repaint();
+                    
+                    //Add label to panel
+                    c.panel.add(lab);      
+                    c.frame.repaint();       
                     c.frame.pack();
 
-                    sleep(100);
-                    c.panel.remove(lab);
+                    
+                    //Sleep for delay
+                    sleep(100);             
+                    
+                     //Removing label for next image
+                    c.panel.remove(lab);   
 
                     System.out.println("Image here");
 
@@ -86,6 +103,7 @@ Toolkit toolkit = Toolkit.getDefaultToolkit();
 
     }
 
+    //Send Events Thread
     class T2 implements Runnable {
 
         @Override
@@ -94,9 +112,12 @@ Toolkit toolkit = Toolkit.getDefaultToolkit();
             while (true) {
                 try {
 
-                    Socket eve = new Socket(serverName, 8888);
+                    //New Socket for send events
+                    
+                    Socket eve = new Socket(serverName, 8888);   
 
-                    new SendEvents(c.panel, eve);
+                     //Instance of SendEvents class
+                    new SendEvents(c.panel, eve);               
 
                 } catch (IOException ex) {
                     Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
@@ -105,7 +126,7 @@ Toolkit toolkit = Toolkit.getDefaultToolkit();
 
         }
     }
-
+      //Thread for Chat
     class T3 implements Runnable {
 
         @Override
@@ -117,24 +138,33 @@ Toolkit toolkit = Toolkit.getDefaultToolkit();
         }
 
     }
-
+    
+    //Client Constructor with IP of Server as parameter 
     Client(String ip) {
-
+       
+        //Frame and Panel Initialization
         c.frame = new JFrame();
         c.panel = new JPanel();
+        
+        //Set frame and Panel size
         c.frame.setSize(1930, 1050);
          c.panel.setSize(1930, 1050);
         c.frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+        
         c.frame.add(c.panel);
         c.frame.pack();
         c.frame.setVisible(true);
-        c.height.set(c.height.get());
-        c.width.set(c.width.get());
+        
+        //Setting IP address of Server
         this.ip = ip;
         serverName = ip;
+        
+        //Creating three Threads
         T1 t1 = new T1();
         T2 t2 = new T2();
         T3 t3 = new T3();
+        
+        //Starting Threads
         new Thread(t1).start();
         new Thread(t2).start();
         new Thread(t3).start();

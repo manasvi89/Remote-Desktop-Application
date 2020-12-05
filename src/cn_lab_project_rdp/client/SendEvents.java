@@ -19,15 +19,22 @@ class SendEvents implements MouseListener, MouseMotionListener, KeyListener {
     int width, height;
     private JPanel frame = null;
 
+    //Constructor with panel and socket as parameters
     SendEvents(JPanel frame, Socket s) {
        
+        //Frame and height, width Initialization
         this.frame = frame;
         this.height = height;
         this.width = width;
+        
+        //Adding Listeners in the frame
         frame.addKeyListener(this);
         frame.addMouseListener(this);
         frame.addMouseMotionListener(this);
+        
         System.out.println("Send Events called");
+        
+        //Getting Output Streams of the Socket for sending Events
         try {
             writer = new PrintWriter(s.getOutputStream());
         } catch (IOException ex) {
@@ -35,6 +42,7 @@ class SendEvents implements MouseListener, MouseMotionListener, KeyListener {
         }
     }
 
+    //Mouse Press Event
     @Override
     public void mousePressed(MouseEvent e) {
         writer.println("1");
@@ -44,6 +52,7 @@ class SendEvents implements MouseListener, MouseMotionListener, KeyListener {
         writer.flush();
     }
 
+    //Mouse Release Event
     @Override
     public void mouseReleased(MouseEvent e) {
         writer.println("2");
@@ -52,7 +61,8 @@ class SendEvents implements MouseListener, MouseMotionListener, KeyListener {
         writer.println(click);
         writer.flush();
     }
-
+    
+    //Mouse Moved Event
     @Override
     public void mouseMoved(MouseEvent e) {
         writer.println("3");
@@ -65,6 +75,7 @@ class SendEvents implements MouseListener, MouseMotionListener, KeyListener {
         writer.flush();
     }
 
+    //Key Pressed Event
     @Override
     public void keyPressed(KeyEvent e) {
         writer.println("4");
@@ -74,6 +85,7 @@ class SendEvents implements MouseListener, MouseMotionListener, KeyListener {
         writer.flush();
     }
 
+    //Key Released Event
     @Override
     public void keyReleased(KeyEvent e) {
         writer.println("5");

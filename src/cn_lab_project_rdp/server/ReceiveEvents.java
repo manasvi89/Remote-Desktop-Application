@@ -1,14 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package cn_lab_project_rdp.server;
 
-/**
- *
- * @author Dishita Madani
- */
 import java.awt.AWTException;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -22,19 +14,33 @@ import java.util.Scanner;
 
 public class ReceiveEvents {
 
+    //Constructor with socket and robot as parameters
     ReceiveEvents(Socket s, Robot r) throws IOException, AWTException {
-
+    
+        //Input Stream for receiving events from clients
         Scanner scanner = new Scanner(s.getInputStream());
+        
+        //Size of the Server screen
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension dimensions = toolkit.getScreenSize();
+        
+        //Creating new capture for height and width values
         Robot re = new Robot();
         BufferedImage st = re.createScreenCapture(new Rectangle(dimensions));
+        
+        //Set height and width values
         int height = st.getHeight();
         int width = st.getWidth();
+        
+        //Received Events decoder
         while (true) {
             try {
+                
+                //Getting Event id from input stream
                 int event = scanner.nextInt();
                 System.out.println(event);
+                
+                //Check Event id and take actions accordingly
                 switch (event) {
                     case 1:
                         int mask = InputEvent.getMaskForButton(event);
